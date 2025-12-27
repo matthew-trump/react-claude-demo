@@ -4,9 +4,37 @@ import './App.css'
 function App() {
   const [question, setQuestion] = useState('')
   const [response, setResponse] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = () => {
-    setResponse('OK')
+  const handleSubmit = async () => {
+    if (!question.trim()) {
+      setResponse('Error: Please enter a question')
+      return
+    }
+
+    setLoading(true)
+    setResponse('Sending request...')
+
+    try {
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question }),
+      })
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`)
+      }
+
+      const data = await res.json()
+      setResponse(data.answer || JSON.stringify(data))
+    } catch (error) {
+      setResponse(`Error: ${error.message}`)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -21,8 +49,8 @@ function App() {
           rows={5}
         />
 
-        <button onClick={handleSubmit}>
-          Submit Question
+        <button onClick={handleSubmit} disabled={loading}>
+          {loading ? 'Sending...' : 'Submit Question'}
         </button>
       </div>
 
