@@ -4,10 +4,47 @@ import './Login.css'
 function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [response, setResponse] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Button does nothing for now
+
+    if (!username.trim() || !password.trim()) {
+      setResponse('Error: Please enter both username and password')
+      return
+    }
+
+    setLoading(true)
+    setResponse('Sending login request...')
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        }),
+      })
+
+      const contentType = res.headers.get('content-type')
+      let data
+
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json()
+        setResponse(JSON.stringify(data, null, 2))
+      } else {
+        data = await res.text()
+        setResponse(data)
+      }
+    } catch (error) {
+      setResponse(`Error: ${error.message}`)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -37,10 +74,17 @@ function Login() {
           />
         </div>
 
-        <button type="submit" className="login-button">
-          Login
+        <button type="submit" className="login-button" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
+
+      {response && (
+        <div className="response-box">
+          <h3>Response:</h3>
+          <pre>{response}</pre>
+        </div>
+      )}
     </div>
   )
 }
