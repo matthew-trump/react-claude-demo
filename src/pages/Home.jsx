@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { buildApiUrl } from '../utils/api'
 import './Home.css'
 
 function Home() {
@@ -16,7 +17,7 @@ function Home() {
     setResponse('Sending request...')
 
     try {
-      const res = await fetch('/api/ask', {
+      const res = await fetch(buildApiUrl('/api/ask'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

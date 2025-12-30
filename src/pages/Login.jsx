@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { buildApiUrl } from '../utils/api'
 import './Login.css'
 
 function Login() {
@@ -19,7 +20,7 @@ function Login() {
     setResponse('Sending login request...')
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch(buildApiUrl('/api/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
