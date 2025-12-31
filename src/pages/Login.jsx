@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import { buildApiUrl } from '../utils/api'
 import './Login.css'
 
 function Login() {
+  const { login } = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [response, setResponse] = useState('')
@@ -40,6 +42,12 @@ function Login() {
       } else {
         data = await res.text()
         setResponse(data)
+      }
+
+      // Set login state on successful response (200)
+      if (res.ok) {
+        login(username)
+        setResponse(`Login successful!\n\n${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}`)
       }
     } catch (error) {
       setResponse(`Error: ${error.message}`)
